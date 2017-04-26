@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+
+    <appender name="file" class="org.apache.log4j.RollingFileAppender">
+        <param name="File" value="D:/App/KafkaStreamingConsumerJob/Log/KafkaStreamingConsumerJob.log" />
+        <param name="Append" value="true" />
+        <param name="MaxFileSize" value="10MB" />
+
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="$##$logtime|:|%d{yyyy-MM-dd HH:mm:ss}$##$level|:|%-5p$##$ clsname|:|%F$##$ mtdname|:|%M$##$  lnum|:|%L$##$ msg|:|%m%n" />
+        </layout>
+    </appender>
+
+    <root>
+        <priority value ="error" />
+        <appender-ref ref="file" />
+
+    </root>
+    <logger name="com.nitendragautam.kafkastreamingconsumerjob">
+        <level value="info"/>
+        <appender-ref ref="file" />
+    </logger>
+</log4j:configuration>
