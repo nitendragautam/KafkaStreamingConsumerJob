@@ -4,8 +4,10 @@ package com.nitendragautam.consumerjob.main
 import java.nio.file.Paths
 
 import akka.actor.ActorSystem
-import akka.kafka.ConsumerSettings
+import akka.kafka.{ConsumerSettings, Subscriptions}
+import akka.kafka.scaladsl.Consumer
 import akka.stream.ActorMaterializer
+import akka.stream.scaladsl.Sink
 import com.typesafe.config.ConfigFactory
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.common.serialization.{StringDeserializer, StringSerializer}
@@ -35,7 +37,16 @@ val consumerSettings = ConsumerSettings(system ,new StringDeserializer ,new Stri
   .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG,"earliest")
 
 
+  Consumer.committableSource(consumerSettings
+    ,Subscriptions.topics(config.getString("kafka.consumer.topic")))
+  .map{
+    msg =>{
+     val msg1= msg.record.value()
+println(msg1)
 
+    }
+  }
+  .runWith(Sink.ignore)
 
 
 }
