@@ -3,18 +3,12 @@ package com.nitendragautam.consumerjob.main
 
 import java.nio.file.Paths
 
-import akka.NotUsed
 import akka.actor.ActorSystem
-import akka.kafka.ProducerSettings
+import akka.kafka.ConsumerSettings
 import akka.stream.ActorMaterializer
-import akka.stream.alpakka.file.scaladsl.FileTailSource
-import akka.stream.scaladsl.Source
 import com.typesafe.config.ConfigFactory
-import org.apache.kafka.clients.producer.ProducerRecord
-import org.apache.kafka.common.serialization.StringSerializer
-
-import scala.concurrent.duration._
-
+import org.apache.kafka.clients.consumer.ConsumerConfig
+import org.apache.kafka.common.serialization.{StringDeserializer, StringSerializer}
 
 /**
   * KafkaStreaming Consumer which consumers from Kafka Topic
@@ -34,6 +28,11 @@ object Boot extends App{
   val kafkaTopic =consumerConfig.getString("topic")
 
 //Todo {Read the data from Kafka Topic using Kafka Streaming API}
+
+val consumerSettings = ConsumerSettings(system ,new StringDeserializer ,new StringDeserializer)
+    .withBootstrapServers(config.getString("kafka.bootstrap.servers"))
+  .withGroupId(config.getString("kafka.consumer.group.id"))
+  .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG,"earliest")
 
 
 
