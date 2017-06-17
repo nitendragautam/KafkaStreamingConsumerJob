@@ -17,7 +17,9 @@ libraryDependencies ++= {
     "com.typesafe.akka" % "akka-stream-kafka_2.11" % "0.13",
     "commons-io" % "commons-io" % "2.5",
     "org.slf4j" % "slf4j-log4j12" % "1.7.21",
-    "log4j" % "log4j" % "1.2.17"
+    "log4j" % "log4j" % "1.2.17",
+    "org.influxdb" % "influxdb-java" % "2.6",
+    "com.google.code.gson" % "gson" % "2.8.1"
   )
 }
 
