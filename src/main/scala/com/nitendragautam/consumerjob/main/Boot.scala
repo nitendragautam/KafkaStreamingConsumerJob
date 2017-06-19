@@ -1,21 +1,25 @@
 package com.nitendragautam.consumerjob.main
 
 
-import java.nio.file.Paths
+
 import java.util.concurrent.TimeUnit
 
+import akka.Done
 import akka.actor.ActorSystem
+import akka.kafka.ConsumerMessage.CommittableOffsetBatch
 import akka.kafka.{ConsumerSettings, Subscriptions}
 import akka.kafka.scaladsl.Consumer
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Sink
 import com.google.gson.Gson
 import com.nitendragautam.consumerjob.domain.KafkaMessage
-import com.nitendragautam.consumerjob.services.InfluxdbRestService
+import com.nitendragautam.consumerjob.services.{InfluxdbRestService, LogService}
 import com.typesafe.config.ConfigFactory
 import org.apache.kafka.clients.consumer.ConsumerConfig
-import org.apache.kafka.common.serialization.{StringDeserializer, StringSerializer}
+import org.apache.kafka.common.serialization.StringDeserializer
 import org.influxdb.dto.Point
+
+import scala.concurrent.Future
 
 /**
   * KafkaStreaming Consumer which consumers from Kafka Topic
@@ -27,52 +31,64 @@ object Boot extends App{
   implicit val materializer =ActorMaterializer()
   implicit val executionContext = system.dispatcher
 
-
-
+val db = new DB
+val logService = new LogService
   val influxdbRestService = new InfluxdbRestService
   val config = ConfigFactory.load()
-  val consumerConfig =config.getConfig("kafka.consumer")
-  val kafkaTopic =consumerConfig.getString("topic")
 
+  val kafkaTopic =config.getString("akka.kafka.consumer.topic")
 //Todo {Read the data from Kafka Topic using Kafka Streaming API}
 
 val consumerSettings = ConsumerSettings(system ,new StringDeserializer ,new StringDeserializer)
-    .withBootstrapServers(config.getString("kafka.bootstrap.servers"))
-  .withGroupId(config.getString("kafka.consumer.group.id"))
+    .withBootstrapServers(config.getString("akka.kafka.consumer.bootstrap.servers"))
+  .withGroupId(config.getString("akka.kafka.consumer.group.id"))
   .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG,"earliest")
 
 
-  Consumer.committableSource(consumerSettings
-    ,Subscriptions.topics(config.getString("kafka.consumer.topic")))
+  Consumer.committableSource(consumerSettings,Subscriptions.topics(kafkaTopic))
   .map{
-    msg =>{
-     val kafkaMessages= msg.record.value()
+    msg =>
       //Process KafkaMessages
-processKafkaMessages(kafkaMessages)
+      db.processKafkaMessages(msg.record.value())
 
-    }
+
   }
-  .runWith(Sink.ignore)
+    .runWith(Sink.ignore)
 
-/*
+
+
+
+
+}
+
+
+class DB {
+  /*
 Processes the Kafka Messages and
  */
+  val logService = new LogService
+  def processKafkaMessages(kafkaMessage :String): Future[Done] ={
+    logService.logMessage("Kafka Message processing "+kafkaMessage)
+    val message =
+      (new Gson).fromJson(kafkaMessage ,KafkaMessage.getClass).asInstanceOf[KafkaMessage]
 
-  def processKafkaMessages(kafkaMessage :String): Unit ={
 
-val message = (new Gson).fromJson(kafkaMessage ,KafkaMessage.getClass).asInstanceOf[KafkaMessage]
-val dbName = config.getString("influxdb.dataBase")
 
-    val point1 = Point
 
-      .measurement("streamanalytics")
+
+    /*
+    val dbName = config.getString("influxdb.dataBase")
+    logService.logMessage("DataBase "+dbName)
+    val point = Point
+      .measurement("stream")
       .time(message.dateTime ,TimeUnit.MILLISECONDS)
-      .tag("ipAddress",message.clientIpAddress)
-      .tag("statusCode",message.httpStatusCode)
+      .addField("ipAddress",message.clientIpAddress)
+      .addField("statusCode",message.httpStatusCode)
 
       .build()
 
-    influxdbRestService.writeDataInfluxDb(point1,dbName)
-
+    influxdbRestService.writeDataInfluxDb(point,dbName)
+*/
+    Future.successful(Done)
   }
 }

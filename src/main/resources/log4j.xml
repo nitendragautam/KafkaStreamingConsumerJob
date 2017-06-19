@@ -17,7 +17,7 @@
         <appender-ref ref="file" />
 
     </root>
-    <logger name="com.nitendragautam.kafkastreamingconsumerjob">
+    <logger name="com.nitendragautam.consumerjob">
         <level value="info"/>
         <appender-ref ref="file" />
     </logger>
