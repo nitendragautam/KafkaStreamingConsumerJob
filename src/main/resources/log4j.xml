@@ -12,11 +12,6 @@
         </layout>
     </appender>
 
-    <root>
-        <priority value ="error" />
-        <appender-ref ref="file" />
-
-    </root>
     <logger name="com.nitendragautam.consumerjob">
         <level value="info"/>
         <appender-ref ref="file" />
