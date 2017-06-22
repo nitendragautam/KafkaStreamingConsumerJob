@@ -14,7 +14,8 @@ libraryDependencies ++= {
   Seq(
     "com.typesafe.akka" %% "akka-actor" % akkaV,
     "com.typesafe.akka" % "akka-stream_2.11" % akkaV,
-    "com.typesafe.akka" % "akka-stream-kafka_2.11" % "0.13",
+    "net.cakesolutions" %% "scala-kafka-client" % "0.10.1.1",
+    "net.cakesolutions" %% "scala-kafka-client-akka" % "0.10.1.1",
     "commons-io" % "commons-io" % "2.5",
     "org.slf4j" % "slf4j-log4j12" % "1.7.21",
     "log4j" % "log4j" % "1.2.17",
