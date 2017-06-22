@@ -3,11 +3,16 @@ package com.nitendragautam.consumerjob.services
 import com.typesafe.config.ConfigFactory
 import org.influxdb.InfluxDBFactory
 import org.influxdb.dto._
+import org.slf4j.{Logger, LoggerFactory}
 
 /**
   * Code for Manipulating InFluxDb database
   */
 class InfluxdbRestService {
+
+
+  private val logger: Logger =
+    LoggerFactory.getLogger(classOf[InfluxdbRestService])
   val config = ConfigFactory.load()
 
 
@@ -53,6 +58,7 @@ class InfluxdbRestService {
       .build()
     batchPoints.point(dataPoint)
     influxDB.write(batchPoints)
+    logger.info(" Data Written to InfluxDB ")
   }
 
 
@@ -64,5 +70,7 @@ class InfluxdbRestService {
 
     influxDB.databaseExists(dbName)
   }
+
+
 
 }
