@@ -2,15 +2,19 @@ package com.nitendragautam.consumerjob.services
 
 
 import java.util.UUID
+import java.util.concurrent.TimeUnit
 
 import akka.actor.{Actor, ActorRef, ActorSystem, Props}
 import cakesolutions.kafka.KafkaConsumer
 import cakesolutions.kafka.akka.KafkaConsumerActor.{Confirm, Subscribe}
 import cakesolutions.kafka.akka.{ConsumerRecords, KafkaConsumerActor}
+import com.nitendragautam.consumerjob.messagehandler.EventMessage
 import com.typesafe.config.{Config, ConfigFactory}
 import org.apache.kafka.clients.consumer.OffsetResetStrategy
 import org.apache.kafka.common.serialization.StringDeserializer
+import org.influxdb.dto.Point
 import org.slf4j.{Logger, LoggerFactory}
+import spray.json._
 
 import scala.concurrent.duration._
 /**
@@ -54,7 +58,7 @@ class ConsumerActors(config :Config ,kafkaConfig: KafkaConsumer.Conf[String,Stri
   context.watch(kafkaConsumerActor)
   kafkaConsumerActor ! Subscribe.AutoPartition(List(kafkaTopic))
 
-
+  import com.nitendragautam.consumerjob.messagehandler.EventMessagesJsonProtocol._
   def receive = {
 
     case recordsExtractor(records) =>
@@ -69,39 +73,35 @@ class ConsumerActors(config :Config ,kafkaConfig: KafkaConsumer.Conf[String,Stri
 
 
   //Process Records
-  private def processRecords(records :ConsumerRecords[String ,String])  ={
+def processRecords(records :ConsumerRecords[String ,String])  = {
 
-    records.pairs.foreach{
-      case (key,value) => {
+  records.pairs.foreach {
 
+    case (key, value) => {
 
-     // val message = (new Gson).fromJson( value,EventMessage).asInstanceOf[EventMessage]
+logger.info("Value "+value)
+      val kafkaMessage = value.parseJson.convertTo[EventMessage]
 
-      //logService.logMessage("Date Time "+message.dateTime +"Message Client IP "+message.clientIpAddress +" ClientHttp Address "+message.httpStatusCode)
-
-
-      logger.info( " TxID " +UUID.randomUUID().toString+" Received Message Value " + value)
+      logger.info("Date Time " + kafkaMessage.dateTime + " Message Client IP " + kafkaMessage.clientIpAddress + " ClientHttp Address " + kafkaMessage.httpStatusCode)
 
 
-/*
+
       val dbName = config.getString("influxdb.dataBase")
 
       val point = Point
         .measurement("stream")
-        .time(message.dateTime ,TimeUnit.MILLISECONDS)
-        .addField("ipAddress",message.clientIpAddress)
-        .addField("statusCode",message.httpStatusCode)
-
+        .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
+        .tag("type","accesslogs")
+        .addField("dateTime",kafkaMessage.dateTime)
+        .addField("ipAddress", kafkaMessage.clientIpAddress)
+        .addField("statusCode", kafkaMessage.httpStatusCode)
         .build()
 
-      influxdbRestService.writeDataInfluxDb(point,dbName)
-  */
+      influxdbRestService.writeDataInfluxDb(point, dbName)
+
 
     }
 
   }
-    sender() ! Confirm(records.offsets, commit = true)
-}
-
-
-}
+  sender() ! Confirm(records.offsets, commit = true)
+}}

@@ -1,6 +1,13 @@
 package com.nitendragautam.consumerjob.messagehandler
 
-case class EventMessage(dateTime :Long,
+import spray.json._
+
+case class EventMessage(dateTime :String,
                         clientIpAddress :String,
                         httpStatusCode :String)
 
+
+
+object EventMessagesJsonProtocol extends DefaultJsonProtocol{
+implicit val eventMessageFormat = jsonFormat3(EventMessage)
+}

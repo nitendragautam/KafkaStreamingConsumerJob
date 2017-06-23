@@ -11,9 +11,11 @@ mainClass in assembly := Some("ccom.nitendragautam.consumerjob.main.Boot")
 assemblyJarName in assembly := "consumerjob.jar"
 libraryDependencies ++= {
   val akkaV       = "2.4.11"
+  val akkaHttp ="10.0.6"
   Seq(
     "com.typesafe.akka" %% "akka-actor" % akkaV,
     "com.typesafe.akka" % "akka-stream_2.11" % akkaV,
+    "com.typesafe.akka" % "akka-http-spray-json_2.11" % akkaHttp ,
     "net.cakesolutions" %% "scala-kafka-client" % "0.10.1.1",
     "net.cakesolutions" %% "scala-kafka-client-akka" % "0.10.1.1",
     "commons-io" % "commons-io" % "2.5",
