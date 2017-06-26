@@ -58,7 +58,6 @@ class InfluxdbRestService {
       .build()
     batchPoints.point(dataPoint)
     influxDB.write(batchPoints)
-    logger.info(" Data Written to InfluxDB ")
   }
 
 

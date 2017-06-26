@@ -91,10 +91,8 @@ logger.info("Value "+value)
       val point = Point
         .measurement("stream")
         .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
-        .tag("type","accesslogs")
-        .addField("dateTime",kafkaMessage.dateTime)
+        .tag("statusCode",kafkaMessage.httpStatusCode)
         .addField("ipAddress", kafkaMessage.clientIpAddress)
-        .addField("statusCode", kafkaMessage.httpStatusCode)
         .build()
 
       influxdbRestService.writeDataInfluxDb(point, dbName)
