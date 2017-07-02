@@ -82,7 +82,10 @@ def processRecords(records :ConsumerRecords[String ,String])  = {
 logger.info("Value "+value)
       val kafkaMessage = value.parseJson.convertTo[EventMessage]
 
-      logger.info("Date Time " + kafkaMessage.dateTime + " Message Client IP " + kafkaMessage.clientIpAddress + " ClientHttp Address " + kafkaMessage.httpStatusCode)
+      logger.info("Date Time " + kafkaMessage.dateTime +
+        " Message Client IP " + kafkaMessage.clientIpAddress +
+        " ClientHttp Address " + kafkaMessage.httpStatusCode
+        +" httpRequestField " +kafkaMessage.httpRequestField)
 
 
 
@@ -93,6 +96,7 @@ logger.info("Value "+value)
         .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
         .tag("statusCode",kafkaMessage.httpStatusCode)
         .addField("ipAddress", kafkaMessage.clientIpAddress)
+        .addField("httpRequestField",kafkaMessage.httpRequestField)
         .build()
 
       influxdbRestService.writeDataInfluxDb(point, dbName)

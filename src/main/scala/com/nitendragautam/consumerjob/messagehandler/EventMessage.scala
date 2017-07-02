@@ -4,10 +4,11 @@ import spray.json._
 
 case class EventMessage(dateTime :String,
                         clientIpAddress :String,
-                        httpStatusCode :String)
+                        httpStatusCode :String,
+                        httpRequestField :String)
 
 
 
 object EventMessagesJsonProtocol extends DefaultJsonProtocol{
-implicit val eventMessageFormat = jsonFormat3(EventMessage)
+implicit val eventMessageFormat = jsonFormat4(EventMessage)
 }
