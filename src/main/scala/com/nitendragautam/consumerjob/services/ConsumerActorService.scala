@@ -65,10 +65,6 @@ class ConsumerActors(config :Config ,kafkaConfig: KafkaConsumer.Conf[String,Stri
 
       processRecords(records) //Process Records
 
-
-
-
-
   }
 
 
@@ -79,13 +75,14 @@ def processRecords(records :ConsumerRecords[String ,String])  = {
 
     case (key, value) => {
 
-logger.info("Value "+value)
+
       val kafkaMessage = value.parseJson.convertTo[EventMessage]
 
       logger.info("Date Time " + kafkaMessage.dateTime +
         " Message Client IP " + kafkaMessage.clientIpAddress +
         " ClientHttp Address " + kafkaMessage.httpStatusCode
-        +" httpRequestField " +kafkaMessage.httpRequestField)
+        +" httpRequestField " +kafkaMessage.httpRequestField
+        +"httpRequestBytes "+kafkaMessage.httpRequestBytes)
 
 
 
@@ -97,6 +94,7 @@ logger.info("Value "+value)
         .tag("statusCode",kafkaMessage.httpStatusCode)
         .addField("ipAddress", kafkaMessage.clientIpAddress)
         .addField("httpRequestField",kafkaMessage.httpRequestField)
+        .addField("httpRequestBytes" ,kafkaMessage.httpRequestBytes)
         .build()
 
       influxdbRestService.writeDataInfluxDb(point, dbName)
