@@ -92,11 +92,10 @@ def processRecords(records :ConsumerRecords[String ,String])  = {
         .measurement("stream")
         .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
         .tag("statusCode",kafkaMessage.httpStatusCode)
-        .addField("ipAddress", kafkaMessage.clientIpAddress)
-        .addField("httpRequestField",kafkaMessage.httpRequestField)
+        .tag("ipAddress", kafkaMessage.clientIpAddress)
+        .tag("httpRequestField",kafkaMessage.httpRequestField)
         .addField("httpRequestBytes" ,kafkaMessage.httpRequestBytes)
         .build()
-
       influxdbRestService.writeDataInfluxDb(point, dbName)
 
 
