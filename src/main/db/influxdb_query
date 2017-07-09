@@ -1,0 +1,2 @@
+#Create a database with retention
+CREATE DATABASE "loganalytics" WITH DURATION 1d
