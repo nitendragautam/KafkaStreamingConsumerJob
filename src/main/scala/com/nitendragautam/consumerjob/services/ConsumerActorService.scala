@@ -29,10 +29,10 @@ object ConsumerActorService {
       bootstrapServers = config.getString("akka.kafka.consumer.bootstrap.servers"),
       groupId = config.getString("akka.kafka.consumer.group.id"),
       enableAutoCommit = false,
-      autoOffsetReset = OffsetResetStrategy.EARLIEST)
+      autoOffsetReset = OffsetResetStrategy.LATEST)
       .withConf(config)
 
-    val actorConf =KafkaConsumerActor.Conf(1.seconds,3.seconds)
+    val actorConf =KafkaConsumerActor.Conf(2.seconds,0.seconds)
     system.actorOf(Props(new ConsumerActors(config,kafkaConsumerConf,actorConf)))
   }
 }
